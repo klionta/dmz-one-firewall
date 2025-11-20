@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  firewall:
+    build: /firewall
+    container_name: fw
+    privilaged: true
+    networks:
+      outside:
+        ipv4_address: 172.20.0.2
+      dmz:
+        ipv4_address: 172.18.0.1
+      inside:
+        ipv4_address: 172.19.0.1
+    cap_add:
+      - NET_ADMIN
+    tty: true
+  
+  dmz:
+    build: /dmz
+    container_name: dmz-web
+    environment:
+      - DB_HOST=172.18.0.2
+      - DB_PORT=5432
+      - DB_USER=test
+      - DB_PASS=test
+    networks:
+      dmz:
+        ipv4_address: 172.19.0.2
+
+  db:
+    image: postgres:15-alpine
+    container_name: internal-db
+    environment:
+    POSTGRES_USER: test
+    POSTGRES_PASSWORD: test
+    POSTGRES_DB: company
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      internal:
+        ipv4_address: 172.19.0.2
+  
+  attacker:
+    build: \attacker
+    container_name: attacker
+    networks:
+      outside:
+      ipv4_address: 172.20.0.3
+    tty: true
+
+networks:
+  outside:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+    dmz:
+      driver: bridge
+      ipam:
+        config:
+          - subnet: 172.19.0.0/24
+    internal:
+      driver: bridge
+      ipam:
+        config:
+          - subnet: 172.18.0.0/24
+
+    
+
+        
