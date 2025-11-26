@@ -39,6 +39,8 @@ docker compose up --build -d
 
 Configure the routing tables of each network:
 
+Inside Private LAN:
+
 ```
 docker exec -it internal-db bash
 ```
@@ -48,6 +50,7 @@ Run:
 ip route add 172.20.0.0/24 via 172.19.0.254 
 ip route add 172.18.0.0/24 via 172.19.0.254
 ```
+Inside DMZ:
 
 ```
 docker exec -it dmz-web bash
@@ -58,6 +61,8 @@ Run:
 ip route add 172.20.0.0/24 via 172.18.0.254 
 ip route add 172.19.0.0/24 via 172.18.0.254
 ```
+
+Inside Outside network: 
 
 ```
 docker exec -it outside bash
@@ -81,7 +86,7 @@ And then type the password `test`. This proves that dmz can access the dm in the
 
 From attacker container run:
 ```
-postsql -h 172.19.0.2 -p 5342 -U test
+psql -h 172.19.0.2 -p 5342 -U test
 ```
 
 Should fail and any try for communication such as ping or curl. This proves that the attacker cannot access the internal db. Again from attacker ask an http resource from dmz:
