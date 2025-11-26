@@ -21,25 +21,61 @@ This network is the private LAN that contains a database at IP address `172.19.0
 ### Atacker
 This host is placed in the outside network. The outside network uses IP addresses from the `172.20.0.0/24` subnet, and the attacker's host has the IP address `172.20.0.3`. We used this host to test our firewall. This host cannot send packets to the internal network, but it can connect to the DMZ network using HTTP.
 
+> [!NOTE]
 > **CHECK the ```dmz-one-firewall.pdf``` to understand the network stucture.**
 
-## Instalation Guidelines
-1. Clone the repository:
+## Instalation and Setup Guidelines
+Clone the repository:
 
-<pre>git clone https://github.com/klionta/dmz-one-firewall.git <pre\>
+`git clone https://github.com/klionta/dmz-one-firewall.git `
 
-2. Build the containers (dmz, internal-db, attacker, firewall):
+Build the containers (dmz-web, internal-db, attacker, firewall):
 
-<pre>docker compose up --build -d <pre\>
+`docker compose up --build -d `
 
-3. Configure the routing tables of each network:
+Configure the routing tables of each network:
 
-<pre>docker exec -it internal-db bash <pre\>
+`docker exec -it internal-db bash `
 
 Run:
+```
+ip route add 172.20.0.0/24 via 172.19.0.254 
+ip route add 172.18.0.0/24 via 172.19.0.254
+```
 
-<pre>ip route add 172.20.0.0/24 via 172.19.0.254 <br>
-ip route add 172.18.0.0/24 via 172.19.0.254 <pre\>
+`docker exec -it dmz-web bash `
+
+Run:
+```
+ip route add 172.20.0.0/24 via 172.18.0.254 
+ip route add 172.19.0.0/24 via 172.18.0.254
+```
+
+`docker exec -it outside bash `
+
+Run:
+```
+ip route add 172.18.0.0/24 via 172.20.0.254 
+ip route add 172.19.0.0/24 via 172.20.0.254
+```
+
+## Example
+From dmz-web container run:
+
+`psql -h 172.19.0.2 -p 5342 -U test`
+
+And then type the password `test`. This proves that dmz can access the dm in the private LAN.
+
+From attacker container run:
+`postsql -h 172.19.0.2 -p 5342 -U test`
+
+Should fail and any try for communication such as ping or curl. This proves that the attacker cannot access the internal db. Again from attacker ask an http resource from dmz:
+
+`curl http://172.19.0.2/`
+
+Should succeed.
+
+
 
 
 
