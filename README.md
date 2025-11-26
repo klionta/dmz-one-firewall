@@ -24,6 +24,22 @@ This host is placed in the outside network. The outside network uses IP addresse
 > **CHECK the ```dmz-one-firewall.pdf``` to understand the network stucture.**
 
 ## Instalation Guidelines
-Clone the repository:
+1. Clone the repository:
 
-```git clone https://github.com/klionta/dmz-one-firewall.git```
+<pre>git clone https://github.com/klionta/dmz-one-firewall.git <pre\>
+
+2. Build the containers (dmz, internal-db, attacker, firewall):
+
+<pre>docker compose up --build -d <pre\>
+
+3. Configure the routing tables of each network:
+
+<pre>docker exec -it internal-db bash <pre\>
+
+Run:
+
+<pre>ip route add 172.20.0.0/24 via 172.19.0.254 <br>
+ip route add 172.18.0.0/24 via 172.19.0.254 <pre\>
+
+
+
