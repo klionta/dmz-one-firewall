@@ -26,4 +26,4 @@ This host is placed in the outside network. The outside network uses IP addresse
 ## Instalation Guidelines
 Clone the repository:
 
-<pre>git clone https://github.com/klionta/dmz-one-firewall.git<pre\>
+```git clone https://github.com/klionta/dmz-one-firewall.git```
