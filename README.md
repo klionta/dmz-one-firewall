@@ -27,15 +27,21 @@ This host is placed in the outside network. The outside network uses IP addresse
 ## Instalation and Setup Guidelines
 Clone the repository:
 
-`git clone https://github.com/klionta/dmz-one-firewall.git `
+```
+git clone https://github.com/klionta/dmz-one-firewall.git 
+```
 
 Build the containers (dmz-web, internal-db, attacker, firewall):
 
-`docker compose up --build -d `
+```
+docker compose up --build -d
+```
 
 Configure the routing tables of each network:
 
-`docker exec -it internal-db bash `
+```
+docker exec -it internal-db bash
+```
 
 Run:
 ```
@@ -43,7 +49,9 @@ ip route add 172.20.0.0/24 via 172.19.0.254
 ip route add 172.18.0.0/24 via 172.19.0.254
 ```
 
-`docker exec -it dmz-web bash `
+```
+docker exec -it dmz-web bash
+```
 
 Run:
 ```
@@ -51,7 +59,9 @@ ip route add 172.20.0.0/24 via 172.18.0.254
 ip route add 172.19.0.0/24 via 172.18.0.254
 ```
 
-`docker exec -it outside bash `
+```
+docker exec -it outside bash
+```
 
 Run:
 ```
@@ -62,16 +72,23 @@ ip route add 172.19.0.0/24 via 172.20.0.254
 ## Example
 From dmz-web container run:
 
-`psql -h 172.19.0.2 -p 5342 -U test`
+```
+psql -h 172.19.0.2 -p 5342 -U test
+
+```
 
 And then type the password `test`. This proves that dmz can access the dm in the private LAN.
 
 From attacker container run:
-`postsql -h 172.19.0.2 -p 5342 -U test`
+```
+postsql -h 172.19.0.2 -p 5342 -U test
+```
 
 Should fail and any try for communication such as ping or curl. This proves that the attacker cannot access the internal db. Again from attacker ask an http resource from dmz:
 
-`curl http://172.19.0.2/`
+```
+curl http://172.19.0.2/
+```
 
 Should succeed.
 
